@@ -14,6 +14,7 @@
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+        <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
         <StyleInclude Source="avares://TomLabs.AutoUpdate.Avalonia/Themes/Default.axaml" />
         <StyleInclude Source="avares://EventBlitz/Styles/Controls.axaml" />
     </Application.Styles>

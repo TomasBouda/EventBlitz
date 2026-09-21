@@ -66,6 +66,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         foreach (var chip in Levels)
             chip.PropertyChanged += (_, _) => ScheduleQuery();
 
+        Events.CollectionChanged += (_, _) => OnPropertyChanged(nameof(EventCountText));
         ChannelSelection.SingleSelect = false;
         ChannelSelection.SelectionChanged += OnChannelSelectionChanged;
 
@@ -567,8 +568,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
                 QueryError = string.Join(" · ", errors.Select(e => e.Error).Distinct());
             UpdateCounts();
             StatusText = exhausted
-                ? $"{Events.Count:#,0} events · {stopwatch.ElapsedMilliseconds} ms"
-                : $"{Events.Count:#,0} events · more available · {stopwatch.ElapsedMilliseconds} ms";
+                ? $"{EventCountText} · {stopwatch.ElapsedMilliseconds} ms"
+                : $"{EventCountText} · more available · {stopwatch.ElapsedMilliseconds} ms";
             OnPropertyChanged(nameof(IsEmpty));
             Log.Debug("Page of {Added} events in {Elapsed} ms, scanned {Scanned}, exhausted {Exhausted}", added, stopwatch.ElapsedMilliseconds, query.Scanned, exhausted);
         });
@@ -579,17 +580,20 @@ public sealed partial class MainWindowViewModel : ObservableObject
         if (_query is { } query)
         {
             ScannedCount = query.Scanned;
-            StatusText = $"Reading… {Events.Count:#,0} events, {ScannedCount:#,0} scanned";
+            StatusText = $"Reading… {EventCountText}, {ScannedCount:#,0} scanned";
         }
         UpdateCounts();
     }
+
+    /// <summary>"1 event" / "1 234 events" for the status texts.</summary>
+    public string EventCountText => $"{Events.Count:#,0} {(Events.Count == 1 ? "event" : "events")}";
 
     private void UpdateCounts()
     {
         var channels = SelectedChannelNames.Count;
         CountText = channels == 0
             ? $"{ChannelCount} channels"
-            : $"{channels} {(channels == 1 ? "channel" : "channels")} · {Events.Count:#,0} events{(LiveCount > 0 ? $" · {LiveCount} live" : string.Empty)}";
+            : $"{channels} {(channels == 1 ? "channel" : "channels")} · {EventCountText}{(LiveCount > 0 ? $" · {LiveCount} live" : string.Empty)}";
     }
 
     /// <summary>Stops a slow search and keeps what has been read so far.</summary>

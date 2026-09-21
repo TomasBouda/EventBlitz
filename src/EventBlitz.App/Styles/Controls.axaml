@@ -1,6 +1,8 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:controls="clr-namespace:EventBlitz.App.Controls">
+        xmlns:controls="clr-namespace:EventBlitz.App.Controls"
+        xmlns:ae="https://github.com/avaloniaui/avaloniaedit"
+        xmlns:icons="https://github.com/projektanker/icons.avalonia">
     <!--
         Control styling for the "ops console" look: hairline borders, 5-6px radii, a single cyan accent,
         and short (≤ 250 ms) ease-out motion. Colours come exclusively from Tokens.axaml.
@@ -324,6 +326,12 @@
         <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
         <Setter Property="FontWeight" Value="Medium"/>
     </Style>
+    <!-- Fluent ships its own filled "accent" class; this puts the soft variant back for the normal state. -->
+    <Style Selector="Button.accent /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource AccentSoftBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+    </Style>
     <Style Selector="Button.accent:pointerover /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource AccentBorderBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
@@ -598,9 +606,47 @@
         <Setter Property="BorderBrush" Value="{DynamicResource HairlineStrongBrush}"/>
     </Style>
 
+    <!-- Clear button (×) whenever the box has text, not only while it has focus (Fluent hides it on blur). -->
+    <Style Selector="TextBox.clearButton:not(:empty)">
+        <Setter Property="InnerRightContent">
+            <Template>
+                <Button Classes="clear" Command="{Binding $parent[TextBox].Clear}" ToolTip.Tip="Clear">
+                    <icons:Icon Value="fa-solid fa-xmark" FontSize="11"/>
+                </Button>
+            </Template>
+        </Setter>
+    </Style>
+    <Style Selector="Button.clear">
+        <Setter Property="Width" Value="20"/>
+        <Setter Property="Height" Value="20"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Margin" Value="0,0,4,0"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Button.clear:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource HoverBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+    </Style>
+
     <!-- Input whose text does not parse. -->
     <Style Selector="TextBox.invalid /template/ Border#PART_BorderElement">
         <Setter Property="BorderBrush" Value="{DynamicResource ErrorBrush}"/>
+    </Style>
+
+    <!-- ===== Read-only code views (event XML and message) ===== -->
+    <Style Selector="ae|TextEditor">
+        <Setter Property="Background" Value="{DynamicResource BgEditorBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="LineNumbersForeground" Value="{DynamicResource TextFaintBrush}"/>
+        <Setter Property="FontFamily" Value="{StaticResource MonoFont}"/>
+        <Setter Property="FontSize" Value="11.5"/>
+        <Setter Property="Padding" Value="18,8"/>
+        <Setter Property="IsReadOnly" Value="True"/>
     </Style>
 
     <!-- ===== Motion ===== -->

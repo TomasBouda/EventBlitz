@@ -10,6 +10,7 @@
         xmlns:icons="https://github.com/projektanker/icons.avalonia"
         xmlns:update="clr-namespace:TomLabs.AutoUpdate.Avalonia;assembly=TomLabs.AutoUpdate.Avalonia"
         xmlns:io="using:System.IO"
+        xmlns:ae="https://github.com/avaloniaui/avaloniaedit"
         mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="780"
         x:Class="EventBlitz.App.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -89,7 +90,7 @@
                                 <icons:Icon Value="fa-solid fa-arrows-rotate" FontSize="10"/>
                             </Button>
                         </Grid>
-                        <TextBox DockPanel.Dock="Top" Name="ChannelSearchBox"
+                        <TextBox DockPanel.Dock="Top" Name="ChannelSearchBox" Classes="clearButton"
                                  Watermark="Filter channels…"
                                  Text="{Binding ChannelSearch}"
                                  Margin="12,0,12,8"/>
@@ -205,11 +206,11 @@
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
 
-                                <TextBox Grid.Column="2" Name="SearchBox" Watermark="Search message, provider, ID…  Ctrl+F" Text="{Binding SearchText}" MinWidth="160"/>
-                                <TextBox Grid.Column="4" Name="EventIdBox" Classes="mono" Width="130" Watermark="ID  1000,!4624" Text="{Binding EventIdText}"
+                                <TextBox Grid.Column="2" Name="SearchBox" Classes="clearButton" Watermark="Search message, provider, ID…  Ctrl+F" Text="{Binding SearchText}" MinWidth="160"/>
+                                <TextBox Grid.Column="4" Name="EventIdBox" Classes="mono clearButton" Width="150" Watermark="ID  1000,!4624" Text="{Binding EventIdText}"
                                          ToolTip.Tip="Event IDs: 1000, 1001-1010, !4624 (exclude)"
                                          Classes.invalid="{Binding EventIdError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
-                                <TextBox Grid.Column="6" Width="150" Watermark="Provider" Text="{Binding ProviderText}" ToolTip.Tip="Provider name contains…"/>
+                                <TextBox Grid.Column="6" Width="170" Classes="clearButton" Watermark="Provider" Text="{Binding ProviderText}" ToolTip.Tip="Provider name contains…"/>
                                 <ComboBox Grid.Column="8" ItemsSource="{Binding TimeRanges}" SelectedItem="{Binding SelectedTimeRange}" Width="140"/>
                                 <Button Grid.Column="10" Classes="icon" Command="{Binding ClearFiltersCommand}" IsVisible="{Binding HasActiveFilter}" ToolTip.Tip="Clear filters (Ctrl+Shift+X)">
                                     <icons:Icon Value="fa-solid fa-filter-circle-xmark" FontSize="13"/>
@@ -220,10 +221,13 @@
                         <!-- Query problems -->
                         <Border Grid.Row="2" Classes="card error" CornerRadius="0" BorderThickness="0,0,0,1" Padding="18,6"
                                 IsVisible="{Binding QueryError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <icons:Icon Value="fa-solid fa-triangle-exclamation" FontSize="11" Foreground="{DynamicResource ErrorBrush}"/>
-                                <TextBlock Classes="error" FontSize="11" Text="{Binding QueryError}" TextWrapping="Wrap" VerticalAlignment="Center"/>
-                            </StackPanel>
+                            <Grid ColumnDefinitions="Auto,8,*,12,Auto">
+                                <icons:Icon Grid.Column="0" Value="fa-solid fa-triangle-exclamation" FontSize="11" Foreground="{DynamicResource ErrorBrush}" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="2" Classes="error" FontSize="11" Text="{Binding QueryError}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                                <Button Grid.Column="4" Classes="accent" Padding="8,3" Command="{Binding RestartAsAdministratorCommand}" IsVisible="{Binding !IsAdministrator}" ToolTip.Tip="Relaunch EventBlitz elevated">
+                                    <StackPanel Spacing="5"><icons:Icon Value="fa-solid fa-shield-halved" FontSize="10"/><TextBlock Text="Restart as administrator" FontSize="11"/></StackPanel>
+                                </Button>
+                            </Grid>
                         </Border>
 
                         <!-- Event list -->
@@ -312,8 +316,8 @@
                                 </StackPanel>
                                 <TextBlock Grid.Column="0" Classes="mono muted" FontSize="10.5" VerticalAlignment="Center" IsVisible="{Binding !IsLoading}">
                                     <TextBlock.Text>
-                                        <MultiBinding StringFormat="{}{0} events loaded">
-                                            <Binding Path="Events.Count" Converter="{StaticResource Count}"/>
+                                        <MultiBinding StringFormat="{}{0} loaded">
+                                            <Binding Path="EventCountText"/>
                                         </MultiBinding>
                                     </TextBlock.Text>
                                 </TextBlock>
@@ -352,9 +356,7 @@
                                 </Grid>
                                 <TabControl SelectedIndex="{Binding DetailTab}" Padding="0">
                                     <TabItem Header="Message">
-                                        <ScrollViewer Padding="18,10">
-                                            <SelectableTextBlock Classes="mono" FontSize="11.5" LineHeight="18" TextWrapping="Wrap" Text="{Binding SelectedEvent.Message, FallbackValue=''}"/>
-                                        </ScrollViewer>
+                                        <ae:TextEditor Name="MessageEditor" WordWrap="True" ShowLineNumbers="False"/>
                                     </TabItem>
                                     <TabItem Header="Details">
                                         <ScrollViewer Padding="18,10">
@@ -396,9 +398,7 @@
                                                     <TextBlock Classes="muted" FontSize="11" Text="reading…" VerticalAlignment="Center" IsVisible="{Binding IsXmlLoading}"/>
                                                 </StackPanel>
                                             </Border>
-                                            <ScrollViewer Padding="18,6,18,10">
-                                                <SelectableTextBlock Classes="mono" FontSize="11" LineHeight="17" Text="{Binding DetailXml}"/>
-                                            </ScrollViewer>
+                                            <ae:TextEditor Name="XmlEditor" ShowLineNumbers="True" FontSize="11"/>
                                         </DockPanel>
                                     </TabItem>
                                 </TabControl>

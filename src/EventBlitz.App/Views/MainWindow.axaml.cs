@@ -2,9 +2,13 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using AvaloniaEdit.TextMate;
+using EventBlitz.App.Controls;
 using EventBlitz.App.ViewModels;
+using TextMateSharp.Grammars;
 
 namespace EventBlitz.App.Views;
 
@@ -13,6 +17,7 @@ public partial class MainWindow : Window
     private bool _gripDragging;
     private double _gripStartY;
     private double _gripStartHeight;
+    private TextMate.Installation? _xmlTextMate;
 
     public MainWindow()
     {
@@ -23,6 +28,36 @@ public partial class MainWindow : Window
         KeyDown += OnKeyDown;
         Loaded += OnLoaded;
         PaletteList.PointerReleased += OnPaletteItemPointerReleased;
+
+        SetupEditors();
+        ActualThemeVariantChanged += (_, _) => ApplyEditorTheme();
+    }
+
+    /// <summary>XML gets a TextMate grammar; the message a colorizer of its own since it is free text with structure.</summary>
+    private void SetupEditors()
+    {
+        var registry = new RegistryOptions(ThemeName.DarkPlus);
+        _xmlTextMate = XmlEditor.InstallTextMate(registry);
+        _xmlTextMate.SetGrammar(registry.GetScopeByLanguageId("xml"));
+        MessageEditor.TextArea.TextView.LineTransformers.Add(new MessageColorizer());
+        MessageEditor.Options.EnableHyperlinks = false;
+        XmlEditor.Options.EnableHyperlinks = false;
+    }
+
+    /// <summary>Dark+ / Light+ follow the app theme; the colorizer reads the theme brushes live, so it only needs a redraw.</summary>
+    private void ApplyEditorTheme()
+    {
+        var dark = ActualThemeVariant == ThemeVariant.Dark;
+        var registry = new RegistryOptions(dark ? ThemeName.DarkPlus : ThemeName.LightPlus);
+        try
+        {
+            _xmlTextMate?.SetTheme(registry.LoadTheme(dark ? ThemeName.DarkPlus : ThemeName.LightPlus));
+        }
+        catch (Exception ex)
+        {
+            Services.AppLog.For("ui").Warning(ex, "Editor theme switch failed");
+        }
+        MessageEditor.TextArea.TextView.Redraw();
     }
 
     private MainWindowViewModel? Vm => DataContext as MainWindowViewModel;
@@ -42,10 +77,24 @@ public partial class MainWindow : Window
             };
             vm.PropertyChanged += (_, args) =>
             {
-                if (args.PropertyName == nameof(MainWindowViewModel.IsMergedView))
-                    UpdateChannelColumn(vm);
+                switch (args.PropertyName)
+                {
+                    case nameof(MainWindowViewModel.IsMergedView):
+                        UpdateChannelColumn(vm);
+                        break;
+                    case nameof(MainWindowViewModel.SelectedEvent):
+                        MessageEditor.Document.Text = vm.SelectedEvent?.Message ?? string.Empty;
+                        MessageEditor.ScrollToHome();
+                        if (vm.SelectedEvent is { } selected) EventsGrid.ScrollIntoView(selected, null);
+                        break;
+                    case nameof(MainWindowViewModel.DetailXml):
+                        XmlEditor.Document.Text = vm.DetailXml;
+                        XmlEditor.ScrollToHome();
+                        break;
+                }
             };
             UpdateChannelColumn(vm);
+            ApplyEditorTheme();
         }
     }
 
