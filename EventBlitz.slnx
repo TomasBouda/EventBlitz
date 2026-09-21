@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/EventBlitz.Core/EventBlitz.Core.csproj" />
+    <Project Path="src/EventBlitz.App/EventBlitz.App.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/EventBlitz.Core.Tests/EventBlitz.Core.Tests.csproj" />
+  </Folder>
+  <Folder Name="/lib/">
+    <Project Path="lib/TomLabs.AutoUpdate/src/TomLabs.AutoUpdate/TomLabs.AutoUpdate.csproj" />
+    <Project Path="lib/TomLabs.AutoUpdate/src/TomLabs.AutoUpdate.Avalonia/TomLabs.AutoUpdate.Avalonia.csproj" />
+  </Folder>
+</Solution>

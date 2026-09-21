@@ -1,0 +1,8 @@
+{
+  "displayName": "EventBlitz",
+  "tagline": "Fast, searchable Windows Event Log viewer: merged channels, live tail, full-text search",
+  "tags": ["windows", "eventlog", "avalonia", "dotnet"],
+  "audience": "Public",
+  "repoUrl": "https://github.com/TomasBouda/EventBlitz",
+  "homepage": "https://github.com/TomasBouda/EventBlitz"
+}

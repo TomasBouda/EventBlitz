@@ -1,0 +1,39 @@
+{
+  "channels": [
+    { "name": "Application" },
+    { "name": "System" },
+    { "name": "Security", "accessError": "Access denied: run as administrator to read this log" },
+    { "name": "Setup" },
+    { "name": "ForwardedEvents", "recordCount": 0 },
+    { "name": "Microsoft-Windows-PowerShell/Operational" },
+    { "name": "Microsoft-Windows-Kernel-Power/Thermal-Operational" },
+    { "name": "Microsoft-Windows-WindowsUpdateClient/Operational" },
+    { "name": "Microsoft-Windows-TaskScheduler/Maintenance", "enabled": false, "recordCount": 0 },
+    { "name": "OpenSSH/Admin", "recordCount": 0 },
+    { "name": "Windows PowerShell" }
+  ],
+  "events": [
+    { "channel": "Application", "time": "2026-09-21T09:12:03.412", "level": "Error", "eventId": 1000, "provider": "Application Error", "task": "Application Crashing Events", "user": "FIXTURE-PC\\tester", "processId": 4120, "threadId": 12, "message": "Faulting application name: Fixture.exe, version: 1.2.3.0, time stamp: 0x66aa0b1c\nFaulting module name: KERNELBASE.dll, version: 10.0.26100.1, time stamp: 0x5c4d1ae0\nException code: 0xe0434352\nFault offset: 0x000000000005f2ac\nFaulting process id: 0x1018\nFaulting application path: C:\\Fixture\\Fixture.exe" },
+    { "channel": "Application", "time": "2026-09-21T09:12:03.988", "level": "Information", "eventId": 1001, "provider": "Windows Error Reporting", "task": "None", "message": "Fault bucket 2205611843567591931, type 4\nEvent Name: APPCRASH\nResponse: Not available\nCab Id: 0" },
+    { "channel": "Application", "time": "2026-09-21T09:05:41.100", "level": "Warning", "eventId": 1530, "provider": "Microsoft-Windows-User Profiles Service", "task": "None", "user": "SYSTEM", "message": "Windows detected your registry file is still in use by other applications or services. The file will be unloaded now. The applications or services that hold your registry file may not function properly afterwards." },
+    { "channel": "Application", "time": "2026-09-21T08:58:10.000", "level": "Information", "eventId": 16384, "provider": "Microsoft-Windows-Security-SPP", "task": "None", "message": "Successfully scheduled Software Protection service for re-start at 2026-09-22T08:58:10Z. Reason: RulesEngine." },
+    { "channel": "Application", "time": "2026-09-21T08:40:22.500", "level": "Critical", "eventId": 4101, "provider": "Fixture Service", "task": "Startup", "message": "Database connection could not be established after 5 attempts; the service is stopping." },
+    { "channel": "Application", "time": "2026-09-21T08:40:20.000", "level": "Error", "eventId": 4100, "provider": "Fixture Service", "task": "Startup", "message": "Connection attempt 5 of 5 to sql.fixture.local failed: timeout after 30 s." },
+    { "channel": "Application", "time": "2026-09-21T08:39:50.000", "level": "Error", "eventId": 4100, "provider": "Fixture Service", "task": "Startup", "message": "Connection attempt 4 of 5 to sql.fixture.local failed: timeout after 30 s." },
+    { "channel": "Application", "time": "2026-09-21T08:30:00.000", "level": "Information", "eventId": 1, "provider": "Fixture Service", "task": "Startup", "message": "Fixture Service 2.4.0 starting." },
+    { "channel": "Application", "time": "2026-09-21T07:15:33.000", "level": "Verbose", "eventId": 900, "provider": "Fixture Service", "task": "Housekeeping", "message": "Cache trimmed: 1 240 entries removed." },
+    { "channel": "Application", "time": "2026-09-20T23:59:59.000", "level": "Information", "eventId": 903, "provider": "Software Protection Platform Service", "message": "The Software Protection service has stopped." },
+    { "channel": "System", "time": "2026-09-21T09:10:00.000", "level": "Warning", "eventId": 7034, "provider": "Service Control Manager", "task": "None", "message": "The Fixture Service service terminated unexpectedly. It has done this 1 time(s)." },
+    { "channel": "System", "time": "2026-09-21T09:00:12.000", "level": "Information", "eventId": 7036, "provider": "Service Control Manager", "message": "The Windows Update service entered the running state." },
+    { "channel": "System", "time": "2026-09-21T08:41:00.000", "level": "Error", "eventId": 7000, "provider": "Service Control Manager", "message": "The Fixture Service service failed to start due to the following error:\nThe service did not respond to the start or control request in a timely fashion." },
+    { "channel": "System", "time": "2026-09-21T06:00:01.000", "level": "Critical", "eventId": 41, "provider": "Microsoft-Windows-Kernel-Power", "task": "(63)", "keywords": "(70368744177664),(2)", "message": "The system has rebooted without cleanly shutting down first. This error could be caused if the system stopped responding, crashed, or lost power unexpectedly." },
+    { "channel": "System", "time": "2026-09-21T06:00:05.000", "level": "Information", "eventId": 6005, "provider": "EventLog", "message": "The Event log service was started." },
+    { "channel": "System", "time": "2026-09-21T06:00:30.000", "level": "Warning", "eventId": 10016, "provider": "Microsoft-Windows-DistributedCOM", "message": "The application-specific permission settings do not grant Local Activation permission for the COM Server application with CLSID {2593F8B9-4EAF-457C-B68A-50F6B8EA6B54} to the user FIXTURE-PC\\tester SID (S-1-5-21-1) from address LocalHost." },
+    { "channel": "Setup", "time": "2026-09-20T18:20:00.000", "level": "Information", "eventId": 2, "provider": "Microsoft-Windows-Servicing", "message": "Package KB5000001 was successfully changed to the Installed state." },
+    { "channel": "Microsoft-Windows-PowerShell/Operational", "time": "2026-09-21T09:11:00.000", "level": "Information", "eventId": 4104, "provider": "Microsoft-Windows-PowerShell", "task": "Execute a Remote Command", "message": "Creating Scriptblock text (1 of 1):\nGet-Service | Where-Object Status -eq Running\n\nScriptBlock ID: 6f1c2a7e-0000-4000-8000-000000000001" },
+    { "channel": "Microsoft-Windows-PowerShell/Operational", "time": "2026-09-21T09:10:58.000", "level": "Verbose", "eventId": 53504, "provider": "Microsoft-Windows-PowerShell", "message": "Windows PowerShell has started an IPC listening thread on process: 5120 in AppDomain: DefaultAppDomain." },
+    { "channel": "Microsoft-Windows-Kernel-Power/Thermal-Operational", "time": "2026-09-21T08:00:00.000", "level": "Warning", "eventId": 125, "provider": "Microsoft-Windows-Kernel-Power", "message": "The system is throttling the processor because of a thermal condition." },
+    { "channel": "Microsoft-Windows-WindowsUpdateClient/Operational", "time": "2026-09-21T03:00:00.000", "level": "Information", "eventId": 19, "provider": "Microsoft-Windows-WindowsUpdateClient", "message": "Installation Successful: Windows successfully installed the following update: Security Intelligence Update for Microsoft Defender Antivirus - KB2267602 (Version 1.400.0.0)" },
+    { "channel": "Windows PowerShell", "time": "2026-09-21T09:10:57.000", "level": "Information", "eventId": 400, "provider": "PowerShell", "message": "Engine state is changed from None to Available." }
+  ]
+}

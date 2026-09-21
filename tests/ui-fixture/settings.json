@@ -1,0 +1,10 @@
+{
+  "Theme": "Dark",
+  "Favorites": [ "Microsoft-Windows-PowerShell/Operational" ],
+  "SelectedChannels": [ "Application" ],
+  "ShowEmptyChannels": false,
+  "TimeRange": "all",
+  "DetailHeight": 240,
+  "LogDirectory": "logs",
+  "LogLevel": "Debug"
+}
