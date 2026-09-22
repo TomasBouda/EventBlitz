@@ -1,4 +1,11 @@
-using System.Collections.ObjectModel;
+            using var asset = Avalonia.Platform.AssetLoader.Open(new Uri($"avares://EventBlitz/Assets/Sounds/{name}.wav"));
+            using var buffer = new MemoryStream();
+            asset.CopyTo(buffer);
+            var bytes = buffer.ToArray();
+            // Re-extract when the shipped file changed (a new build with another sound); the files are tiny, so compare bytes.
+            if (!File.Exists(target) || !File.ReadAllBytes(target).AsSpan().SequenceEqual(bytes))
+                File.WriteAllBytes(target, bytes);
+            return target;using System.Collections.ObjectModel;
 using Avalonia.Threading;
 using EventBlitz.Core.Models;
 using EventBlitz.Core.Services;

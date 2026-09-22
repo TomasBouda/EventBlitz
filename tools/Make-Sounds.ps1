@@ -83,7 +83,7 @@ function WriteWav([string] $path, [double[]] $buffer) {
     $scale = if ($peak -gt 0) { 0.9 / $peak } else { 1 }
     $data = [byte[]]::new($buffer.Length * 2)
     for ($i = 0; $i -lt $buffer.Length; $i++) {
-        $v = [int][Math]::Round([Math]::Clamp($buffer[$i] * $scale, -1, 1) * 32767)
+        $v = [int][Math]::Round([Math]::Clamp([double]($buffer[$i] * $scale), -1.0, 1.0) * 32767)
         $data[2 * $i] = [byte]($v -band 0xFF)
         $data[2 * $i + 1] = [byte](($v -shr 8) -band 0xFF)
     }
