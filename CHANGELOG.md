@@ -6,7 +6,7 @@
 - Added: merged view — Ctrl+click several channels and see their events in one time-ordered list.
 - Added: filter strip with level chips, time range, event ID list (`1000, 1001-1010, !4624`), provider and full-text search that runs through the whole log, streaming matches as they are found.
 - Added: live tail (Ctrl+L) that inserts new events at the top as they are written.
-- Added: alerts (Ctrl+Shift+A): rules on chosen channels with level, event ID, provider and text conditions run in the background whatever is on screen and fire a sound (one notification sound in a notify / warning / critical variant, or any WAV), a toast in the corner and a taskbar flash; "New from current view" turns the current channels and filter into a rule, hits are listed and open the event on click, mute switch and a per-rule 3 s sound cooldown.
+- Added: alerts (Ctrl+Shift+A): rules on chosen channels with level, event ID, provider and text conditions run in the background whatever is on screen and fire a sound (a distinct built-in sound per level, or any WAV), a toast in the corner and a taskbar flash; "New from current view" turns the current channels and filter into a rule, hits are listed and open the event on click, mute switch and a per-rule 3 s sound cooldown.
 - Added: detail pane with the syntax-highlighted message (labels, numbers, paths, GUIDs, problem words) and event XML, all system properties, plus one-click "only this ID / provider" filters and copy.
 - Added: "Restart as administrator" right in the access-denied banner; clear buttons (×) in every search box.
 - Added: command palette (Ctrl+K), light/dark theme, restart as administrator for the Security log.

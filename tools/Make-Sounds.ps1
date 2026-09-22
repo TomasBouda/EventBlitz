@@ -1,16 +1,15 @@
 #requires -Version 7
 <#
 .SYNOPSIS
-    Builds the three built-in alert sounds in src/EventBlitz.App/Assets/Sounds from one source recording,
-    tools/notification.wav ("Notification" by original_sound, freesound.org/s/364658, CC BY 3.0):
-      notify.wav   - the recording, mixed to mono and trimmed of trailing silence
-      warning.wav  - the same hit pitched down (resampled) so it reads as "something is off"
-      critical.wav - two hits, the second lower, unmistakable but still the same voice
-    Output is 44.1 kHz 16-bit mono PCM, which is what winmm PlaySound handles without codecs.
+    Converts the alert sound sources in tools/sounds (notify.wav, warning.wav, critical.wav — one distinct recording
+    per level) into the shipped assets in src/EventBlitz.App/Assets/Sounds: 44.1 kHz 16-bit mono PCM trimmed of
+    trailing silence, which is what winmm PlaySound handles without codecs. A level whose source is missing gets
+    notify.wav, so the app always has all three.
+    Sources: notify = "Message Notification 4" by AnthonyRox (freesound.org/s/740423, CC0).
 #>
 param(
     [string] $RepoRoot = (Split-Path $PSScriptRoot -Parent),
-    [string] $Source = (Join-Path $PSScriptRoot 'notification.wav')
+    [string] $SourceDir = (Join-Path $PSScriptRoot 'sounds')
 )
 
 $ErrorActionPreference = 'Stop'
@@ -100,10 +99,10 @@ function WriteWav([string] $path, [double[]] $buffer) {
 $dir = Join-Path $RepoRoot 'src/EventBlitz.App/Assets/Sounds'
 New-Item -ItemType Directory -Force $dir | Out-Null
 
-$hit = Trim (ReadWavMono $Source)
-WriteWav (Join-Path $dir 'notify.wav') $hit
-WriteWav (Join-Path $dir 'warning.wav') (Resample $hit 0.84)
-$critical = Mix @((Resample $hit 0.92), (Resample $hit 0.76)) @(0.0, 0.22) @(1.0, 1.0)
-WriteWav (Join-Path $dir 'critical.wav') $critical
-
-Write-Host ("notify {0:0.00}s, warning {1:0.00}s, critical {2:0.00}s written to {3}" -f ($hit.Length / $rate), ($hit.Length / 0.84 / $rate), ($critical.Length / $rate), $dir)
+foreach ($level in 'notify', 'warning', 'critical') {
+    $source = Join-Path $SourceDir "$level.wav"
+    if (-not (Test-Path $source)) { $source = Join-Path $SourceDir 'notify.wav' }
+    $samples = Trim (ReadWavMono $source)
+    WriteWav (Join-Path $dir "$level.wav") $samples
+    Write-Host ("{0,-8} {1:0.00}s  <- {2}" -f $level, ($samples.Length / $rate), (Split-Path $source -Leaf))
+}
