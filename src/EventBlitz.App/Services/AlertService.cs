@@ -1,11 +1,4 @@
-            using var asset = Avalonia.Platform.AssetLoader.Open(new Uri($"avares://EventBlitz/Assets/Sounds/{name}.wav"));
-            using var buffer = new MemoryStream();
-            asset.CopyTo(buffer);
-            var bytes = buffer.ToArray();
-            // Re-extract when the shipped file changed (a new build with another sound); the files are tiny, so compare bytes.
-            if (!File.Exists(target) || !File.ReadAllBytes(target).AsSpan().SequenceEqual(bytes))
-                File.WriteAllBytes(target, bytes);
-            return target;using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using Avalonia.Threading;
 using EventBlitz.Core.Models;
 using EventBlitz.Core.Services;
@@ -156,12 +149,12 @@ public sealed class AlertService : IDisposable
             Directory.CreateDirectory(dir);
             var target = Path.Combine(dir, $"{name}.wav");
             using var asset = Avalonia.Platform.AssetLoader.Open(new Uri($"avares://EventBlitz/Assets/Sounds/{name}.wav"));
-            // Re-extract when the shipped file changed (a new build with another sound), otherwise reuse the copy.
-            if (!File.Exists(target) || new FileInfo(target).Length != asset.Length)
-            {
-                using var output = File.Create(target);
-                asset.CopyTo(output);
-            }
+            using var buffer = new MemoryStream();
+            asset.CopyTo(buffer);
+            var bytes = buffer.ToArray();
+            // Re-extract when the shipped file changed (a new build with another sound); the files are tiny, so compare bytes.
+            if (!File.Exists(target) || !File.ReadAllBytes(target).AsSpan().SequenceEqual(bytes))
+                File.WriteAllBytes(target, bytes);
             return target;
         }
         catch (Exception ex)
