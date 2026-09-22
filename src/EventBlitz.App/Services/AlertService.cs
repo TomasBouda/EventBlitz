@@ -112,30 +112,27 @@ public sealed class AlertService : IDisposable
         Triggered?.Invoke(hit);
     }
 
-    /// <summary>System sounds come from the user's sound scheme (MessageBeep); a custom WAV goes through winmm PlaySound, asynchronously.</summary>
+    /// <summary>
+    /// The built-in sounds are EventBlitz's own (synthesised by tools/Make-Sounds.ps1, shipped as assets); they are
+    /// copied next to the settings once and played through winmm asynchronously. A custom WAV goes the same way.
+    /// </summary>
     public static void Play(AlertSound sound, string? path)
     {
         if (!OperatingSystem.IsWindows()) return;
         try
         {
-            switch (sound)
+            var file = sound switch
             {
-                case AlertSound.Notify:
-                    MessageBeep(MbIconAsterisk);
-                    break;
-                case AlertSound.Warning:
-                    MessageBeep(MbIconExclamation);
-                    break;
-                case AlertSound.Critical:
-                    MessageBeep(MbIconHand);
-                    break;
-                case AlertSound.Custom when !string.IsNullOrWhiteSpace(path) && File.Exists(path):
-                    PlaySound(path, IntPtr.Zero, SndFilename | SndAsync | SndNoDefault);
-                    break;
-                case AlertSound.Custom:
-                    MessageBeep(MbIconAsterisk);
-                    break;
-            }
+                AlertSound.Notify => BuiltIn("notify"),
+                AlertSound.Warning => BuiltIn("warning"),
+                AlertSound.Critical => BuiltIn("critical"),
+                AlertSound.Custom when !string.IsNullOrWhiteSpace(path) && File.Exists(path) => path,
+                AlertSound.Custom => BuiltIn("notify"),
+                _ => null,
+            };
+            if (file is null) return;
+            if (!PlaySound(file, IntPtr.Zero, SndFilename | SndAsync | SndNoDefault))
+                MessageBeep(MbIconAsterisk);
         }
         catch (Exception ex)
         {
@@ -143,8 +140,29 @@ public sealed class AlertService : IDisposable
         }
     }
 
-    private const uint MbIconHand = 0x10;
-    private const uint MbIconExclamation = 0x30;
+    /// <summary>Extracts an asset WAV to %LOCALAPPDATA%\EventBlitz\sounds (once per build) and returns its path.</summary>
+    private static string? BuiltIn(string name)
+    {
+        try
+        {
+            var dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppInfo.Name, "sounds");
+            Directory.CreateDirectory(dir);
+            var target = Path.Combine(dir, $"{name}-{AppInfo.Version}.wav");
+            if (!File.Exists(target))
+            {
+                using var asset = Avalonia.Platform.AssetLoader.Open(new Uri($"avares://EventBlitz/Assets/Sounds/{name}.wav"));
+                using var output = File.Create(target);
+                asset.CopyTo(output);
+            }
+            return target;
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Built-in sound {Name} is not available", name);
+            return null;
+        }
+    }
+
     private const uint MbIconAsterisk = 0x40;
     private const uint SndAsync = 0x1;
     private const uint SndNoDefault = 0x2;
