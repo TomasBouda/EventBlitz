@@ -5,7 +5,9 @@
     per level) into the shipped assets in src/EventBlitz.App/Assets/Sounds: 44.1 kHz 16-bit mono PCM trimmed of
     trailing silence, which is what winmm PlaySound handles without codecs. A level whose source is missing gets
     notify.wav, so the app always has all three.
-    Sources: notify = "Message Notification 4" by AnthonyRox (freesound.org/s/740423, CC0).
+    Sources: notify = "Message Notification 4" by AnthonyRox (freesound.org/s/740423, CC0),
+             critical = "Error Bleep 1" by original_sound (freesound.org/s/372200, CC BY 3.0).
+    MP3 sources are converted first: ffmpeg -i in.mp3 -ac 1 -ar 44100 -sample_fmt s16 tools/sounds/<level>.wav
 #>
 param(
     [string] $RepoRoot = (Split-Path $PSScriptRoot -Parent),

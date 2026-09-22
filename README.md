@@ -59,5 +59,6 @@ channels; `src/EventBlitz.App` is the Avalonia UI. `lib/TomLabs.AutoUpdate` is a
 
 ## License
 
-MIT. Alert sounds: "Message Notification 4" by AnthonyRox ([freesound.org/s/740423](https://freesound.org/s/740423/), CC0);
+MIT. Alert sounds from freesound.org: "Message Notification 4" by AnthonyRox ([s/740423](https://freesound.org/s/740423/), CC0)
+and "Error Bleep 1" by original_sound ([s/372200](https://freesound.org/s/372200/), [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/));
 the sources live in `tools/sounds` and `tools/Make-Sounds.ps1` converts them to the shipped assets.
