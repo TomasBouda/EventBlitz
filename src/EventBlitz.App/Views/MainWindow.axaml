@@ -34,7 +34,7 @@
 
             <!-- ===== Header (doubles as the title bar) ===== -->
             <Border Grid.Row="0" Classes="hairline-b" Padding="14,0,150,0" Name="HeaderBar" Background="Transparent" PointerPressed="OnHeaderPointerPressed">
-                <Grid ColumnDefinitions="Auto,12,380,*,Auto,12,Auto,Auto,Auto,12,Auto" VerticalAlignment="Center">
+                <Grid ColumnDefinitions="Auto,12,380,*,Auto,12,Auto,Auto,Auto,Auto,12,Auto" VerticalAlignment="Center">
                     <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                         <icons:Icon Value="fa-solid fa-bolt-lightning" FontSize="15" Foreground="{DynamicResource LogoBrush}"/>
                         <TextBlock Text="EventBlitz" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
@@ -70,10 +70,19 @@
                     <Button Grid.Column="7" Classes="icon" Command="{Binding RunQueryCommand}" ToolTip.Tip="Reload events (F5)">
                         <icons:Icon Value="fa-solid fa-arrows-rotate" FontSize="13"/>
                     </Button>
-                    <Button Grid.Column="8" Classes="icon" Command="{Binding ToggleThemeCommand}" ToolTip.Tip="Toggle light / dark (Ctrl+Shift+L)">
+                    <Button Grid.Column="8" Classes="icon" Command="{Binding ToggleAlertsCommand}" ToolTip.Tip="Alerts: sound and toast on matching events (Ctrl+Shift+A)">
+                        <Panel>
+                            <icons:Icon Value="fa-regular fa-bell" FontSize="13" IsVisible="{Binding !Alerts.IsMuted}"/>
+                            <icons:Icon Value="fa-regular fa-bell-slash" FontSize="13" IsVisible="{Binding Alerts.IsMuted}"/>
+                            <Border Classes="badge" IsVisible="{Binding Alerts.UnreadCount}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-4,-6,0">
+                                <TextBlock Text="{Binding Alerts.UnreadCount}"/>
+                            </Border>
+                        </Panel>
+                    </Button>
+                    <Button Grid.Column="9" Classes="icon" Command="{Binding ToggleThemeCommand}" ToolTip.Tip="Toggle light / dark (Ctrl+Shift+L)">
                         <icons:Icon Value="fa-solid fa-circle-half-stroke" FontSize="13"/>
                     </Button>
-                    <TextBlock Grid.Column="10" Classes="mono muted" FontSize="11" Text="{Binding AppVersion}" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="11" Classes="mono muted" FontSize="11" Text="{Binding AppVersion}" VerticalAlignment="Center"/>
                 </Grid>
             </Border>
 
@@ -161,7 +170,7 @@
                 <Panel Grid.Column="1">
 
                     <!-- Events page -->
-                    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto" IsVisible="{Binding !ShowAppLog}">
+                    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto" IsVisible="{Binding ShowEvents}">
 
                         <!-- Title row -->
                         <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="18,14,18,8" Classes="fade-in" IsVisible="{Binding HasSelection}">
@@ -456,6 +465,164 @@
                         </Grid>
                     </DockPanel>
                     </Panel>
+
+                    <!-- Alerts page -->
+                    <Panel IsVisible="{Binding ShowAlerts}">
+                    <DockPanel DataContext="{Binding Alerts}" x:DataType="vm:AlertsViewModel">
+                        <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="18,14,18,8" Classes="fade-in">
+                            <StackPanel Spacing="3" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <TextBlock Classes="title" Text="Alerts"/>
+                                    <Border Classes="chip" IsVisible="{Binding IsMuted}"><TextBlock Text="MUTED"/></Border>
+                                </StackPanel>
+                                <TextBlock Classes="mono muted" FontSize="11">
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} rules · {1} active · watching in the background while EventBlitz runs">
+                                            <Binding Path="Rules.Count"/>
+                                            <Binding Path="ActiveCount"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                <Button Classes="accent" Command="{Binding AddFromViewCommand}" ToolTip.Tip="A rule pre-filled with the channels and filter currently on screen">
+                                    <StackPanel><icons:Icon Value="fa-solid fa-plus" FontSize="10"/><TextBlock Text="New from current view"/></StackPanel>
+                                </Button>
+                                <Button Command="{Binding AddCommand}"><StackPanel><icons:Icon Value="fa-solid fa-plus" FontSize="10"/><TextBlock Text="New"/></StackPanel></Button>
+                                <Button Command="{Binding ToggleMuteCommand}">
+                                    <StackPanel>
+                                        <icons:Icon Value="fa-regular fa-bell-slash" FontSize="11" IsVisible="{Binding !IsMuted}"/>
+                                        <icons:Icon Value="fa-regular fa-bell" FontSize="11" IsVisible="{Binding IsMuted}"/>
+                                        <TextBlock Text="Mute" IsVisible="{Binding !IsMuted}"/>
+                                        <TextBlock Text="Unmute" IsVisible="{Binding IsMuted}"/>
+                                    </StackPanel>
+                                </Button>
+                                <Border Classes="vsep"/>
+                                <Button Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ToggleAlertsCommand}"><StackPanel><icons:Icon Value="fa-solid fa-arrow-left" FontSize="11"/><TextBlock Text="Back to events"/></StackPanel></Button>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Hits -->
+                        <Border DockPanel.Dock="Bottom" Classes="hairline-t" Height="220" Background="{DynamicResource BgEditorBrush}">
+                            <DockPanel>
+                                <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="18,8,18,4">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Classes="section" Text="HITS" VerticalAlignment="Center"/>
+                                        <TextBlock Classes="mono muted" FontSize="10.5" Text="{Binding History.Count}" VerticalAlignment="Center"/>
+                                        <TextBlock Classes="muted" FontSize="11" Text="click a row to open the event" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <Button Grid.Column="1" Classes="ghost" Padding="6,2" Command="{Binding ClearHistoryCommand}"><TextBlock Text="Clear" FontSize="11"/></Button>
+                                </Grid>
+                                <ListBox Name="HitsList" ItemsSource="{Binding History}" Classes="rows compact" SelectionMode="Single">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate x:DataType="services:AlertHit">
+                                            <Grid ColumnDefinitions="64,80,160,180,60,*">
+                                                <TextBlock Classes="mono muted" FontSize="11" Text="{Binding Time, StringFormat='{}{0:HH:mm:ss}'}"/>
+                                                <TextBlock Grid.Column="1" Classes="mono" FontSize="10" Text="{Binding Event.LevelName}" Foreground="{Binding Event.Level, Converter={StaticResource LevelBrush}}"/>
+                                                <TextBlock Grid.Column="2" FontSize="11.5" FontWeight="Medium" Text="{Binding Rule.Name}" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Grid.Column="3" Classes="muted" FontSize="11" Text="{Binding Event.Provider}" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Grid.Column="4" Classes="mono" FontSize="11" Text="{Binding Event.EventId}"/>
+                                                <TextBlock Grid.Column="5" FontSize="11.5" Text="{Binding Event.FirstLine}" TextTrimming="CharacterEllipsis"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </DockPanel>
+                        </Border>
+
+                        <Grid ColumnDefinitions="300,*">
+                            <!-- Rule list -->
+                            <Border Grid.Column="0" Classes="hairline-r hairline-t">
+                                <DockPanel>
+                                    <StackPanel DockPanel.Dock="Top" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8" Margin="18,40" IsVisible="{Binding !HasRules}">
+                                        <icons:Icon Value="fa-regular fa-bell" FontSize="22" Foreground="{DynamicResource TextFaintBrush}" HorizontalAlignment="Center"/>
+                                        <TextBlock Classes="secondary" FontSize="12" Text="No alerts yet" HorizontalAlignment="Center"/>
+                                        <TextBlock Classes="muted" FontSize="11" Text="pick channels and a filter, then New from current view" TextWrapping="Wrap" TextAlignment="Center"/>
+                                    </StackPanel>
+                                    <ListBox ItemsSource="{Binding Rules}" SelectedItem="{Binding SelectedRule}" Classes="rows">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate x:DataType="vm:AlertRuleViewModel">
+                                                <Grid ColumnDefinitions="Auto,10,*,Auto">
+                                                    <controls:StatusDot IsRunning="{Binding IsEnabled}" IsLive="{Binding IsEnabled}" VerticalAlignment="Center"/>
+                                                    <StackPanel Grid.Column="2" Spacing="1">
+                                                        <TextBlock Text="{Binding Name}" FontSize="12.5" FontWeight="Medium" TextTrimming="CharacterEllipsis" Classes.secondary="{Binding !IsEnabled}"/>
+                                                        <TextBlock Text="{Binding Summary}" Classes="mono muted" FontSize="10.5" TextTrimming="CharacterEllipsis"/>
+                                                    </StackPanel>
+                                                    <icons:Icon Grid.Column="3" Value="fa-solid fa-volume-high" FontSize="10" Foreground="{DynamicResource TextFaintBrush}" IsVisible="{Binding HasSound}" VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </DockPanel>
+                            </Border>
+
+                            <!-- Editor -->
+                            <Border Grid.Column="1" Classes="hairline-t">
+                                <ScrollViewer IsVisible="{Binding SelectedRule, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                    <StackPanel Margin="18,14" Spacing="12" DataContext="{Binding SelectedRule}" x:DataType="vm:AlertRuleViewModel">
+                                        <StackPanel.Styles>
+                                            <Style Selector="TextBlock.k"><Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/><Setter Property="FontSize" Value="11"/><Setter Property="VerticalAlignment" Value="Center"/></Style>
+                                        </StackPanel.Styles>
+                                        <Grid ColumnDefinitions="110,*,12,Auto">
+                                            <TextBlock Classes="k" Text="Name"/>
+                                            <TextBox Grid.Column="1" Text="{Binding Name}"/>
+                                            <CheckBox Grid.Column="3" IsChecked="{Binding IsEnabled}" MinHeight="0"><TextBlock Classes="muted" FontSize="11" Text="Enabled"/></CheckBox>
+                                        </Grid>
+                                        <Grid ColumnDefinitions="110,*,8,Auto">
+                                            <TextBlock Classes="k" Text="Channels"/>
+                                            <TextBox Grid.Column="1" Classes="mono" Text="{Binding ChannelsText}" Watermark="Application, System, Microsoft-Windows-Kernel-Power/Thermal-Operational" ToolTip.Tip="Full channel names, comma separated"/>
+                                            <Button Grid.Column="3" Name="UseSelectedChannelsButton" Click="OnUseSelectedChannels" ToolTip.Tip="Take the channels selected in the sidebar">
+                                                <StackPanel><icons:Icon Value="fa-solid fa-arrow-left" FontSize="10"/><TextBlock Text="Selected"/></StackPanel>
+                                            </Button>
+                                        </Grid>
+                                        <Grid ColumnDefinitions="110,*">
+                                            <TextBlock Classes="k" Text="Levels"/>
+                                            <ItemsControl Grid.Column="1" ItemsSource="{Binding Levels}">
+                                                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="3"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate x:DataType="vm:LevelChip">
+                                                        <ToggleButton Classes="level" IsChecked="{Binding IsSelected}" ToolTip.Tip="{Binding Label}">
+                                                            <TextBlock Text="{Binding ShortLabel}" Foreground="{Binding Mask, Converter={StaticResource LevelBrush}}"/>
+                                                        </ToggleButton>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </Grid>
+                                        <Grid ColumnDefinitions="110,200,12,110,*">
+                                            <TextBlock Classes="k" Text="Event IDs"/>
+                                            <TextBox Grid.Column="1" Classes="mono clearButton" Text="{Binding EventIds}" Watermark="any  ·  1000, !4624"
+                                                     Classes.invalid="{Binding EventIdError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                                            <TextBlock Grid.Column="3" Classes="k" Text="Provider" Margin="0,0,8,0" HorizontalAlignment="Right"/>
+                                            <TextBox Grid.Column="4" Classes="clearButton" Text="{Binding Provider}" Watermark="any  ·  name contains…"/>
+                                        </Grid>
+                                        <Grid ColumnDefinitions="110,*">
+                                            <TextBlock Classes="k" Text="Message text"/>
+                                            <TextBox Grid.Column="1" Classes="clearButton" Text="{Binding Text}" Watermark="any  ·  every word must appear in the message"/>
+                                        </Grid>
+                                        <Grid ColumnDefinitions="110,160,12,*">
+                                            <TextBlock Classes="k" Text="Sound"/>
+                                            <ComboBox Grid.Column="1" ItemsSource="{Binding $parent[DockPanel].((vm:AlertsViewModel)DataContext).SoundOptions}" SelectedItem="{Binding Sound}"/>
+                                            <TextBox Grid.Column="3" Classes="mono" Text="{Binding SoundPath}" Watermark="C:\path\to\sound.wav" IsVisible="{Binding IsCustomSound}"/>
+                                        </Grid>
+                                        <Grid ColumnDefinitions="110,*">
+                                            <CheckBox Grid.Column="1" IsChecked="{Binding ShowToast}" MinHeight="0"><TextBlock Classes="muted" FontSize="11" Text="Show a toast in the corner of the window"/></CheckBox>
+                                        </Grid>
+                                        <StackPanel Orientation="Horizontal" Spacing="6" Margin="110,6,0,0">
+                                            <Button Command="{Binding $parent[DockPanel].((vm:AlertsViewModel)DataContext).TestCommand}" CommandParameter="{Binding}" ToolTip.Tip="Play the sound and show the toast now">
+                                                <StackPanel><icons:Icon Value="fa-solid fa-play" FontSize="10"/><TextBlock Text="Test"/></StackPanel>
+                                            </Button>
+                                            <Button Command="{Binding $parent[DockPanel].((vm:AlertsViewModel)DataContext).RemoveCommand}" CommandParameter="{Binding}">
+                                                <StackPanel><icons:Icon Value="fa-regular fa-trash-can" FontSize="10"/><TextBlock Text="Remove"/></StackPanel>
+                                            </Button>
+                                        </StackPanel>
+                                        <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap" Margin="110,4,0,0"
+                                                   Text="Rules are saved as you type and watch their channels as long as EventBlitz is running, whatever is selected in the sidebar. The same rule plays its sound at most once every 3 seconds."/>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </Border>
+                        </Grid>
+                    </DockPanel>
+                    </Panel>
                 </Panel>
             </Grid>
 
@@ -471,6 +638,35 @@
                 </Grid>
             </Border>
         </Grid>
+
+        <!-- ===== Alert toasts (bottom right, above the status bar) ===== -->
+        <ItemsControl ItemsSource="{Binding Toasts}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,18,44" Width="380">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate><StackPanel Spacing="8"/></ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:ToastViewModel">
+                    <Border Classes="toast popin" BorderBrush="{Binding Level, Converter={StaticResource LevelBrush}}">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Button Classes="toastbody" Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).RevealAlertCommand}" CommandParameter="{Binding}" ToolTip.Tip="Open the event">
+                                <StackPanel Orientation="Vertical" Spacing="3">
+                                    <Grid ColumnDefinitions="Auto,8,*,8,Auto">
+                                        <TextBlock Classes="mono" FontSize="10" FontWeight="SemiBold" Text="{Binding LevelName}" Foreground="{Binding Level, Converter={StaticResource LevelBrush}}" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Classes="h" Text="{Binding Title}" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Grid.Column="4" Classes="mono muted" FontSize="10.5" Text="{Binding TimeText}"/>
+                                    </Grid>
+                                    <TextBlock Classes="muted" FontSize="11" Text="{Binding Subtitle}" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock FontSize="11.5" Text="{Binding Line}" TextTrimming="CharacterEllipsis" MaxLines="2" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Grid.Column="1" Classes="clear" VerticalAlignment="Top" Margin="4,6,6,0" Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).DismissToastCommand}" CommandParameter="{Binding}" ToolTip.Tip="Dismiss">
+                                <icons:Icon Value="fa-solid fa-xmark" FontSize="11"/>
+                            </Button>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
 
         <!-- ===== Command palette (Ctrl+K) ===== -->
         <Panel IsVisible="{Binding Palette.IsOpen}">

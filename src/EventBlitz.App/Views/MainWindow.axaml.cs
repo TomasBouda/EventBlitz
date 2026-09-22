@@ -95,8 +95,56 @@ public partial class MainWindow : Window
             };
             UpdateChannelColumn(vm);
             ApplyEditorTheme();
+            vm.AlertRaised += _ => FlashTaskbar();
+            HitsList.SelectionChanged += (_, _) =>
+            {
+                if (HitsList.SelectedItem is Services.AlertHit hit)
+                {
+                    HitsList.SelectedItem = null;
+                    vm.RevealAlertCommand.Execute(hit);
+                }
+            };
         }
     }
+
+    /// <summary>The rule editor's "Selected" button copies the sidebar selection into the channel list.</summary>
+    private void OnUseSelectedChannels(object? sender, RoutedEventArgs e)
+    {
+        if (Vm is { } vm && (sender as Control)?.DataContext is AlertRuleViewModel rule)
+            rule.SetChannels(vm.SelectedChannelNames);
+    }
+
+    /// <summary>Flashes the taskbar button until the window is activated, so an alert is noticed while it sits in the background.</summary>
+    private void FlashTaskbar()
+    {
+        if (!OperatingSystem.IsWindows() || IsActive) return;
+        if (TryGetPlatformHandle()?.Handle is not { } handle || handle == IntPtr.Zero) return;
+        var info = new FlashWInfo
+        {
+            cbSize = (uint)System.Runtime.InteropServices.Marshal.SizeOf<FlashWInfo>(),
+            hwnd = handle,
+            dwFlags = FlashTray | FlashTimerNoFg,
+            uCount = uint.MaxValue,
+            dwTimeout = 0,
+        };
+        FlashWindowEx(ref info);
+    }
+
+    private const uint FlashTray = 0x2;
+    private const uint FlashTimerNoFg = 0xC;
+
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    private struct FlashWInfo
+    {
+        public uint cbSize;
+        public IntPtr hwnd;
+        public uint dwFlags;
+        public uint uCount;
+        public uint dwTimeout;
+    }
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool FlashWindowEx(ref FlashWInfo info);
 
     /// <summary>The channel column only earns its space when more than one channel is on screen.</summary>
     private void UpdateChannelColumn(MainWindowViewModel vm)
@@ -166,6 +214,10 @@ public partial class MainWindow : Window
                     break;
                 case Key.X:
                     vm.ClearFiltersCommand.Execute(null);
+                    e.Handled = true;
+                    break;
+                case Key.A:
+                    vm.ToggleAlertsCommand.Execute(null);
                     e.Handled = true;
                     break;
             }

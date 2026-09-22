@@ -32,6 +32,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     private static readonly ILogger Log = AppLog.For("main");
 
     private readonly IEventLogSource _source;
+    private readonly AlertService _alertService;
     private readonly UserSettings _settings;
     private readonly List<ChannelItemViewModel> _allChannels = new();
     private readonly DispatcherTimer _queryDebounce;
@@ -47,6 +48,9 @@ public sealed partial class MainWindowViewModel : ObservableObject
     {
         _source = source;
         _settings = settings;
+        _alertService = new AlertService(source);
+        _alertService.Triggered += OnAlertTriggered;
+        Alerts = new AlertsViewModel(_alertService, settings) { CurrentView = () => (SelectedChannelNames, BuildFilter()) };
 
         _queryDebounce = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
         _queryDebounce.Tick += (_, _) =>
@@ -571,6 +575,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
                 ? $"{EventCountText} · {stopwatch.ElapsedMilliseconds} ms"
                 : $"{EventCountText} · more available · {stopwatch.ElapsedMilliseconds} ms";
             OnPropertyChanged(nameof(IsEmpty));
+            CompletePendingReveal();
             Log.Debug("Page of {Added} events in {Elapsed} ms, scanned {Scanned}, exhausted {Exhausted}", added, stopwatch.ElapsedMilliseconds, query.Scanned, exhausted);
         });
     }
@@ -749,6 +754,101 @@ public sealed partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void ToggleAppLog() => ShowAppLog = !ShowAppLog;
 
+    // ----- Alerts -----
+
+    public AlertsViewModel Alerts { get; }
+
+    /// <summary>Toast cards currently on screen, newest last.</summary>
+    public ObservableCollection<ToastViewModel> Toasts { get; } = new();
+
+    /// <summary>Raised on every alert hit so the window can flash the taskbar button.</summary>
+    public event Action<AlertHit>? AlertRaised;
+
+    /// <summary>The Alerts page replaces the event view while on.</summary>
+    [ObservableProperty]
+    private bool _showAlerts;
+
+    public bool ShowEvents => !ShowAppLog && !ShowAlerts;
+
+    private (string Channel, long RecordId)? _pendingReveal;
+
+    partial void OnShowAlertsChanged(bool value)
+    {
+        if (value) ShowAppLog = false;
+        Alerts.IsVisible = value;
+        OnPropertyChanged(nameof(ShowEvents));
+    }
+
+    partial void OnShowAppLogChanged(bool value)
+    {
+        if (value) ShowAlerts = false;
+        OnPropertyChanged(nameof(ShowEvents));
+    }
+
+    [RelayCommand]
+    private void ToggleAlerts() => ShowAlerts = !ShowAlerts;
+
+    private void OnAlertTriggered(AlertHit hit)
+    {
+        if (hit.Rule.ShowToast)
+        {
+            var toast = new ToastViewModel(hit);
+            Toasts.Add(toast);
+            while (Toasts.Count > 4)
+                Toasts.RemoveAt(0);
+            var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(10) };
+            timer.Tick += (_, _) =>
+            {
+                timer.Stop();
+                Toasts.Remove(toast);
+            };
+            timer.Start();
+        }
+        AlertRaised?.Invoke(hit);
+    }
+
+    [RelayCommand]
+    private void DismissToast(ToastViewModel? toast)
+    {
+        if (toast is not null) Toasts.Remove(toast);
+    }
+
+    /// <summary>Jumps to the event behind a toast or a history row: its channel, all levels, and the row selected once loaded.</summary>
+    [RelayCommand]
+    private void RevealAlert(object? parameter)
+    {
+        var hit = parameter switch
+        {
+            ToastViewModel toast => toast.Hit,
+            AlertHit h => h,
+            _ => null,
+        };
+        if (hit is null) return;
+        if (parameter is ToastViewModel t) Toasts.Remove(t);
+        if (hit.Event.RecordId == 0) return; // a test hit has no event behind it
+
+        ShowAlerts = false;
+        ShowAppLog = false;
+        _pendingReveal = (hit.Event.Channel, hit.Event.RecordId);
+        foreach (var chip in Levels) chip.IsSelected = true;
+        SearchText = string.Empty;
+        EventIdText = string.Empty;
+        ProviderText = string.Empty;
+        SelectChannels([hit.Event.Channel]);
+    }
+
+    private void CompletePendingReveal()
+    {
+        if (_pendingReveal is not { } reveal) return;
+        _pendingReveal = null;
+        var match = Events.FirstOrDefault(e => e.Channel == reveal.Channel && e.RecordId == reveal.RecordId);
+        if (match is not null)
+            SelectedEvent = match;
+        else
+            StatusText = "The event is outside the loaded range";
+    }
+
+
     /// <summary>Relaunches the same executable elevated so the Security log becomes readable.</summary>
     [RelayCommand]
     private void RestartAsAdministrator()
@@ -771,6 +871,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     public void Shutdown()
     {
+        _alertService.Dispose();
         _queryCts?.Cancel();
         StopWatcher();
         _query?.Dispose();

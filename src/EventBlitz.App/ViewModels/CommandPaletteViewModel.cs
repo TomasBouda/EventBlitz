@@ -115,6 +115,10 @@ public sealed partial class CommandPaletteViewModel : ObservableObject
         }
         _all.Add(new PaletteItem("Channel", "fa-solid fa-layer-group", "Application + System", "the usual pair", "", () => vm.SelectChannels(["Application", "System"])));
 
+        _all.Add(new PaletteItem("Alerts", "fa-regular fa-bell", vm.ShowAlerts ? "Back to events" : "Alerts…", $"{vm.Alerts.Rules.Count} rules · {vm.Alerts.ActiveCount} active", "Ctrl+Shift+A", () => vm.ToggleAlertsCommand.Execute(null)));
+        _all.Add(new PaletteItem("Alerts", "fa-solid fa-plus", "New alert from current view", "sound + toast for what you are looking at", "", () => { vm.Alerts.AddFromViewCommand.Execute(null); vm.ShowAlerts = true; }));
+        _all.Add(new PaletteItem("Alerts", vm.Alerts.IsMuted ? "fa-regular fa-bell" : "fa-regular fa-bell-slash", vm.Alerts.IsMuted ? "Unmute alerts" : "Mute alerts", "sound only; toasts stay", "", () => vm.Alerts.ToggleMuteCommand.Execute(null)));
+
         _all.Add(new PaletteItem("App", "fa-solid fa-arrows-rotate", "Refresh channels", "re-read sizes and counts", "", () => vm.RefreshChannelsCommand.Execute(null)));
         _all.Add(new PaletteItem("App", "fa-solid fa-eye", vm.ShowEmptyChannels ? "Hide empty channels" : "Show empty channels", "sidebar", "", () => vm.ShowEmptyChannels = !vm.ShowEmptyChannels));
         _all.Add(new PaletteItem("App", "fa-solid fa-circle-half-stroke", "Toggle light / dark", "remembered for next start", "Ctrl+Shift+L", () => vm.ToggleThemeCommand.Execute(null)));

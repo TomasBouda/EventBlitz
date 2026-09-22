@@ -110,7 +110,8 @@ public partial class App : Application
         server.Actions["page"] = (_, arg) =>
         {
             viewModel.ShowAppLog = string.Equals(arg, "log", StringComparison.OrdinalIgnoreCase);
-            return new { page = viewModel.ShowAppLog ? "log" : "events" };
+            viewModel.ShowAlerts = string.Equals(arg, "alerts", StringComparison.OrdinalIgnoreCase);
+            return new { page = viewModel.ShowAppLog ? "log" : viewModel.ShowAlerts ? "alerts" : "events" };
         };
         return server;
     }

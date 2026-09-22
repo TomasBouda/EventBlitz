@@ -9,7 +9,11 @@ IISBlitz with a cyan accent, custom title bar). Chat in Czech, everything in the
   per-channel cursors, newest first, lazy priming so a full-log text search is cancellable). Keep logic here — it is
   what the tests cover.
 - `src/EventBlitz.App`: `MainWindowViewModel` owns channels, filter, paging (1000 per page, 100 per UI chunk), live
-  watcher and the detail pane; `CommandPaletteViewModel`; `LogsViewModel` (the app's own Serilog log page).
+  watcher, the detail pane and the toasts; `AlertService` runs one watcher per alert rule (sound via user32/winmm,
+  no extra package) and `AlertsViewModel` edits the rules; `CommandPaletteViewModel`; `LogsViewModel` (the app's own
+  Serilog log page). The fixture source cannot fire events, so alerts are checked with the rule's Test button
+  (`click?text=Test`) or against the real log (`--data-dir`, then run `powershell.exe -c Get-Date` to write
+  "Windows PowerShell" engine events).
 - Data folder: `%APPDATA%\EventBlitz` or `EVENTBLITZ_DATA_DIR`. When it contains `events.json` the app shows that
   fixture instead of the live log — that is how UI checks stay deterministic.
 - Releases: GitHub Releases through the shared `publish-app.yml` of TomLabs.AutoUpdate (`.github/workflows`);
@@ -28,7 +32,7 @@ tomlabs-ui call "do/channel?arg=Application,System"                     # select
 tomlabs-ui call "do/range?arg=all"                                       # time range key: 15m 1h 24h 7d 30d all
 tomlabs-ui call "set?path=SearchText&value=service"
 tomlabs-ui call "click?text=Database connection could not"               # select an event → detail pane
-tomlabs-ui call "do/page?arg=log"                                        # app log page (arg=events to go back)
+tomlabs-ui call "do/page?arg=log"                                        # app log page (alerts | events)
 tomlabs-ui shot C:\...\main.png                                          # then Read the PNG
 tomlabs-ui call "get?path=StatusText"
 tomlabs-ui stop

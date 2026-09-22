@@ -5,6 +5,11 @@
   "ShowEmptyChannels": false,
   "TimeRange": "all",
   "DetailHeight": 240,
+  "Alerts": [
+    { "Id": "6f1c2a7e-0000-4000-8000-0000000000a1", "Name": "Fixture Service failures", "IsEnabled": true, "Channels": [ "Application" ], "Levels": 6, "EventIds": "4100-4199", "Provider": "Fixture Service", "Text": "", "Sound": 2, "ShowToast": true },
+    { "Id": "6f1c2a7e-0000-4000-8000-0000000000a2", "Name": "Unexpected reboots", "IsEnabled": true, "Channels": [ "System" ], "Levels": 2, "EventIds": "41", "Provider": "", "Text": "", "Sound": 3, "ShowToast": true },
+    { "Id": "6f1c2a7e-0000-4000-8000-0000000000a3", "Name": "PowerShell scripts (silent)", "IsEnabled": false, "Channels": [ "Microsoft-Windows-PowerShell/Operational", "Windows PowerShell" ], "Levels": 62, "EventIds": "4104", "Provider": "", "Text": "", "Sound": 0, "ShowToast": true }
+  ],
   "LogDirectory": "logs",
   "LogLevel": "Debug"
 }

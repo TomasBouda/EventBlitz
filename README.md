@@ -1,4 +1,5 @@
-# EventBlitz
+| Ctrl+L | live tail on/off |
+| Ctrl+Shift+A | alerts page |# EventBlitz
 
 A fast, searchable viewer for the Windows Event Log — the built-in Event Viewer rebuilt as a dense, keyboard-first
 ops console. Avalonia · .NET 10 · one portable exe.
@@ -15,6 +16,9 @@ ops console. Avalonia · .NET 10 · one portable exe.
   full-text search that walks the whole log and shows matches as they are found, with a live "scanned" counter and
   a Stop button. Level, time and IDs are pushed down to the Event Log as XPath; text runs on the formatted message.
 - **Live tail** (Ctrl+L) — new events are inserted at the top the moment they are written.
+- **Alerts** (Ctrl+Shift+A) — subscribe to channels with a level / ID / provider / text condition; a rule watches in
+  the background whatever you are looking at and fires a sound, a toast in the corner and a taskbar flash. "New from
+  current view" makes a rule out of the channels and filter on screen; every hit is listed and opens the event on click.
 - **Detail pane** with the message, every system property (task, keywords, user, PID/TID, activity ID…) and the
   raw XML; "only this ID" / "only this provider" turn an event into a filter with one click.
 - **Command palette** (Ctrl+K) across channels, filters and actions; light and dark theme; restart as

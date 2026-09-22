@@ -35,6 +35,12 @@ public sealed class UserSettings
     /// <summary>Height of the detail pane in pixels.</summary>
     public double DetailHeight { get; set; } = 260;
 
+    /// <summary>Alert rules: background watchers with sound and toast.</summary>
+    public List<Core.Models.AlertRule> Alerts { get; set; } = new();
+
+    /// <summary>Alerts still show but stay silent.</summary>
+    public bool AlertsMuted { get; set; }
+
     /// <summary>Log directory: absolute, or relative to the data folder; null = %LOCALAPPDATA%\EventBlitz\logs.</summary>
     public string? LogDirectory { get; set; }
 

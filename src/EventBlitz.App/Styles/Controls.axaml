@@ -633,6 +633,40 @@
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
     </Style>
 
+    <!-- Unread counter on the bell. -->
+    <Style Selector="Border.badge">
+        <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+        <Setter Property="CornerRadius" Value="7"/>
+        <Setter Property="MinWidth" Value="14"/>
+        <Setter Property="Height" Value="14"/>
+        <Setter Property="Padding" Value="4,0"/>
+    </Style>
+    <Style Selector="Border.badge > TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource MonoFont}"/>
+        <Setter Property="FontSize" Value="9"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="{DynamicResource BgColor}"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Alert toast: elevated card with a 2px level-coloured bar on the left. -->
+    <Style Selector="Border.toast">
+        <Setter Property="Background" Value="{DynamicResource BgElevatedBrush}"/>
+        <Setter Property="BorderThickness" Value="3,1,1,1"/>
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="BoxShadow" Value="0 12 32 0 #66000000"/>
+        <Setter Property="ClipToBounds" Value="False"/>
+    </Style>
+    <Style Selector="Button.toastbody">
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Padding" Value="12,9"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="CornerRadius" Value="5"/>
+    </Style>
+
     <!-- Input whose text does not parse. -->
     <Style Selector="TextBox.invalid /template/ Border#PART_BorderElement">
         <Setter Property="BorderBrush" Value="{DynamicResource ErrorBrush}"/>
