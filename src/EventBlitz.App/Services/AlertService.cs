@@ -114,7 +114,7 @@ public sealed class AlertService : IDisposable
 
     /// <summary>
     /// The built-in sounds are EventBlitz's own (synthesised by tools/Make-Sounds.ps1, shipped as assets); they are
-    /// copied next to the settings once and played through winmm asynchronously. A custom WAV goes the same way.
+    /// copied to the local app data folder and played through winmm asynchronously. A custom WAV goes the same way.
     /// </summary>
     public static void Play(AlertSound sound, string? path)
     {
@@ -147,10 +147,11 @@ public sealed class AlertService : IDisposable
         {
             var dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppInfo.Name, "sounds");
             Directory.CreateDirectory(dir);
-            var target = Path.Combine(dir, $"{name}-{AppInfo.Version}.wav");
-            if (!File.Exists(target))
+            var target = Path.Combine(dir, $"{name}.wav");
+            using var asset = Avalonia.Platform.AssetLoader.Open(new Uri($"avares://EventBlitz/Assets/Sounds/{name}.wav"));
+            // Re-extract when the shipped file changed (a new build with another sound), otherwise reuse the copy.
+            if (!File.Exists(target) || new FileInfo(target).Length != asset.Length)
             {
-                using var asset = Avalonia.Platform.AssetLoader.Open(new Uri($"avares://EventBlitz/Assets/Sounds/{name}.wav"));
                 using var output = File.Create(target);
                 asset.CopyTo(output);
             }

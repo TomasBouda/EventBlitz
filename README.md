@@ -59,4 +59,6 @@ channels; `src/EventBlitz.App` is the Avalonia UI. `lib/TomLabs.AutoUpdate` is a
 
 ## License
 
-MIT
+MIT. The alert sounds are derived from ["Notification"](https://freesound.org/s/364658/) by original_sound
+(freesound.org), licensed [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/); `tools/Make-Sounds.ps1` builds the
+notify / warning / critical variants from it.
