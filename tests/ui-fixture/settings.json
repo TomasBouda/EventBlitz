@@ -1,5 +1,6 @@
 {
   "Theme": "Dark",
+  "ThemeVersion": 2,
   "Favorites": [ "Microsoft-Windows-PowerShell/Operational" ],
   "SelectedChannels": [ "Application" ],
   "ShowEmptyChannels": false,

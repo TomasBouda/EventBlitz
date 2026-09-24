@@ -21,18 +21,9 @@ public partial class App : Application
         AvaloniaXamlLoader.Load(this);
         _settings = UserSettings.Load();
         AppLog.Initialize(_settings);
-        ApplySavedTheme();
-    }
-
-    /// <summary>Restores the theme the user picked last time; without a saved choice the OS preference applies.</summary>
-    private void ApplySavedTheme()
-    {
-        RequestedThemeVariant = _settings.Theme switch
-        {
-            "Dark" => ThemeVariant.Dark,
-            "Light" => ThemeVariant.Light,
-            _ => ThemeVariant.Default,
-        };
+        _settings.MigrateTheme();
+        // System (no saved choice) leaves the variant at Default, so the palette follows Windows live.
+        RequestedThemeVariant = ThemeModes.ToVariant(_settings.Theme);
     }
 
     public override void OnFrameworkInitializationCompleted()

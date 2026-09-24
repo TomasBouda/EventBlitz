@@ -121,7 +121,10 @@ public sealed partial class CommandPaletteViewModel : ObservableObject
 
         _all.Add(new PaletteItem("App", "fa-solid fa-arrows-rotate", "Refresh channels", "re-read sizes and counts", "", () => vm.RefreshChannelsCommand.Execute(null)));
         _all.Add(new PaletteItem("App", "fa-solid fa-eye", vm.ShowEmptyChannels ? "Hide empty channels" : "Show empty channels", "sidebar", "", () => vm.ShowEmptyChannels = !vm.ShowEmptyChannels));
-        _all.Add(new PaletteItem("App", "fa-solid fa-circle-half-stroke", "Toggle light / dark", "remembered for next start", "Ctrl+Shift+L", () => vm.ToggleThemeCommand.Execute(null)));
+        _all.Add(new PaletteItem("App", "fa-solid fa-circle-half-stroke", "Cycle theme", "system → light → dark", "Ctrl+Shift+L", () => vm.CycleThemeCommand.Execute(null)));
+        _all.Add(new PaletteItem("App", ThemeModes.Icon(ThemeModes.System), "Theme: system", "follows Windows", "", () => vm.SetThemeCommand.Execute(ThemeModes.System)));
+        _all.Add(new PaletteItem("App", ThemeModes.Icon(ThemeModes.Light), "Theme: light", "remembered for next start", "", () => vm.SetThemeCommand.Execute(ThemeModes.Light)));
+        _all.Add(new PaletteItem("App", ThemeModes.Icon(ThemeModes.Dark), "Theme: dark", "remembered for next start", "", () => vm.SetThemeCommand.Execute(ThemeModes.Dark)));
         _all.Add(new PaletteItem("App", "fa-solid fa-file-lines", vm.ShowAppLog ? "Back to events" : "Open app log", AppLog.Directory, "", () => vm.ToggleAppLogCommand.Execute(null)));
         if (!vm.IsAdministrator)
             _all.Add(new PaletteItem("App", "fa-solid fa-shield-halved", "Restart as administrator", "needed for the Security log", "", () => vm.RestartAsAdministratorCommand.Execute(null)));

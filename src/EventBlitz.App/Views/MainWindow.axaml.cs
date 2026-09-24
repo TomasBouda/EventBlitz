@@ -209,7 +209,7 @@ public partial class MainWindow : Window
             switch (e.Key)
             {
                 case Key.L:
-                    vm.ToggleThemeCommand.Execute(null);
+                    vm.CycleThemeCommand.Execute(null);
                     e.Handled = true;
                     break;
                 case Key.X:

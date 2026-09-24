@@ -21,7 +21,7 @@ ops console. Avalonia · .NET 10 · one portable exe.
   current view" makes a rule out of the channels and filter on screen; every hit is listed and opens the event on click.
 - **Detail pane** with the message, every system property (task, keywords, user, PID/TID, activity ID…) and the
   raw XML; "only this ID" / "only this provider" turn an event into a filter with one click.
-- **Command palette** (Ctrl+K) across channels, filters and actions; light and dark theme; restart as
+- **Command palette** (Ctrl+K) across channels, filters and actions; theme switch System / Light / Dark (System follows Windows live); restart as
   administrator when the Security log is needed.
 - Self-updating from GitHub Releases (stable = tagged releases, nightly = every push to master).
 
@@ -54,7 +54,7 @@ channels; `src/EventBlitz.App` is the Avalonia UI. `lib/TomLabs.AutoUpdate` is a
 | Esc | stop a running search |
 | Ctrl+C | copy the selected event |
 | Ctrl+Shift+X | clear filters |
-| Ctrl+Shift+L | light / dark |
+| Ctrl+Shift+L | theme: system → light → dark |
 | Ctrl+click | merge channels |
 
 ## License

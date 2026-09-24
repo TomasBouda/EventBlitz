@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1 — 2026-09-24
+
+- Changed: the theme switch now has a System option that follows Windows live; earlier Light/Dark choices were reset to System once.
+- Added: the header button shows the current mode (half circle = System, sun, moon); the command palette can set each mode directly.
+
 ## 0.1.0 — 2026-09-21
 
 - Added: sidebar with every channel of the machine (Windows Logs, Applications and Services Logs, favourites), sizes and record counts, search, empty channels hidden by default.

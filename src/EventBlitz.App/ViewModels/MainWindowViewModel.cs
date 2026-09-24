@@ -741,14 +741,34 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     // ----- App -----
 
-    [RelayCommand]
-    private void ToggleTheme()
+    /// <summary>The theme mode: System (follows Windows live), Light or Dark.</summary>
+    public string ThemeMode => ThemeModes.Normalize(_settings.Theme);
+
+    public string ThemeIcon => ThemeModes.Icon(_settings.Theme);
+
+    public string ThemeTip => ThemeMode switch
     {
-        if (Application.Current is not { } app) return;
-        var dark = app.ActualThemeVariant == ThemeVariant.Dark;
-        app.RequestedThemeVariant = dark ? ThemeVariant.Light : ThemeVariant.Dark;
-        _settings.Theme = dark ? "Light" : "Dark";
+        ThemeModes.Light => "Theme: light — switch to dark (Ctrl+Shift+L)",
+        ThemeModes.Dark => "Theme: dark — switch to system (Ctrl+Shift+L)",
+        _ => "Theme: system, follows Windows — switch to light (Ctrl+Shift+L)",
+    };
+
+    /// <summary>Header switch and Ctrl+Shift+L: System → Light → Dark → System.</summary>
+    [RelayCommand]
+    private void CycleTheme() => SetTheme(ThemeModes.Next(_settings.Theme));
+
+    [RelayCommand]
+    private void SetTheme(string? mode)
+    {
+        mode = ThemeModes.Normalize(mode);
+        _settings.Theme = mode == ThemeModes.System ? null : mode;
+        _settings.ThemeVersion = ThemeModes.CurrentVersion;
         _settings.Save();
+        ThemeModes.Apply(_settings.Theme);
+        OnPropertyChanged(nameof(ThemeMode));
+        OnPropertyChanged(nameof(ThemeIcon));
+        OnPropertyChanged(nameof(ThemeTip));
+        Log.Debug("Theme mode set to {Theme}", mode);
     }
 
     [RelayCommand]
