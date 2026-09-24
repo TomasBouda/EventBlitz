@@ -8,7 +8,7 @@
     <Company>TomLabs</Company>
     <!-- Single source of truth for the version shown in the UI and read by the updater;
          CI appends -nightly.<sha> for nightly builds. -->
-    <VersionPrefix>0.1.1</VersionPrefix>
+    <VersionPrefix>0.1.2</VersionPrefix>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
 </Project>

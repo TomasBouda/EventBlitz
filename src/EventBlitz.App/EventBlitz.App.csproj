@@ -54,6 +54,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EventBlitz.Core\EventBlitz.Core.csproj" />
-    <ProjectReference Include="..\..\lib\TomLabs.AutoUpdate\src\TomLabs.AutoUpdate.Avalonia\TomLabs.AutoUpdate.Avalonia.csproj" />
+    <PackageReference Include="TomLabs.AutoUpdate.Avalonia" Version="0.3.2" />
   </ItemGroup>
 </Project>

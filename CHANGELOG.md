@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2 — 2026-09-24
+
+- Changed: the self-update library comes from nuget.org (TomLabs.AutoUpdate 0.3.2) instead of a git submodule; updates work as before.
+
 ## 0.1.1 — 2026-09-24
 
 - Changed: the theme switch now has a System option that follows Windows live; earlier Light/Dark choices were reset to System once.

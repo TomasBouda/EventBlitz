@@ -34,14 +34,14 @@ unzip and start `EventBlitz.exe`. No installation; settings live in `%APPDATA%\E
 ## Build
 
 ```bash
-git clone --recurse-submodules https://github.com/TomasBouda/EventBlitz.git
+git clone https://github.com/TomasBouda/EventBlitz.git
 dotnet build EventBlitz.slnx
 dotnet test tests/EventBlitz.Core.Tests/EventBlitz.Core.Tests.csproj
 dotnet run --project src/EventBlitz.App
 ```
 
 `src/EventBlitz.Core` reads the log (`System.Diagnostics.Eventing.Reader`), builds XPath from the filter and merges
-channels; `src/EventBlitz.App` is the Avalonia UI. `lib/TomLabs.AutoUpdate` is a submodule.
+channels; `src/EventBlitz.App` is the Avalonia UI. The self-update library `TomLabs.AutoUpdate.Avalonia` comes from nuget.org.
 
 ## Keyboard
 
